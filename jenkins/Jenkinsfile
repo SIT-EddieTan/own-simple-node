@@ -1,20 +1,18 @@
 pipeline {
     agent {
         docker {
-            image 'node:14'  // Use a specific Node.js Docker image
-            args '-u root:root'  // Run the container as root to avoid permission issues
+            image 'node:14'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from your Git repository
                 checkout scm
             }
         }
         stage('Build') {
             steps {
-                // Install Node.js dependencies
                 sh 'npm install'
             }
         }
@@ -37,7 +35,6 @@ pipeline {
     }
     post {
         always {
-            // Any cleanup steps, if necessary
             echo 'Cleaning up...'
         }
     }
