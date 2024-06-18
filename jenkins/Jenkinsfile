@@ -1,8 +1,20 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:14'  // Use a specific Node.js Docker image
+            args '-u root:root'  // Run the container as root to avoid permission issues
+        }
+    }
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your Git repository
+                checkout scm
+            }
+        }
         stage('Build') {
             steps {
+                // Install Node.js dependencies
                 sh 'npm install'
             }
         }
@@ -13,15 +25,20 @@ pipeline {
                 sh './jenkins/scripts/test.sh'
             }
         }
-        stage('Deliver') { 
+        stage('Deliver') {
             steps {
                 sh 'chmod +x ./jenkins/scripts/deliver.sh'
-                sh './jenkins/scripts/deliver.sh' 
-                input message: 'Finished using the web site? (Click "Proceed" to continue)' 
+                sh './jenkins/scripts/deliver.sh'
+                input message: 'Finished using the web site? (Click "Proceed" to continue)'
                 sh 'chmod +x ./jenkins/scripts/kill.sh'
-                sh './jenkins/scripts/kill.sh' 
+                sh './jenkins/scripts/kill.sh'
             }
         }
     }
+    post {
+        always {
+            // Any cleanup steps, if necessary
+            echo 'Cleaning up...'
+        }
+    }
 }
-
