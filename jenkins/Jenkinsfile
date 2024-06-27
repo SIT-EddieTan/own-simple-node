@@ -23,6 +23,21 @@ pipeline {
                 sh './jenkins/scripts/test.sh'
             }
         }
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                script {
+                    // Run OWASP Dependency-Check
+                    dependencyCheck additionalArguments: '''
+                        -o './'
+                        -s './'
+                        -f 'ALL'
+                        --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+
+                    // Publish Dependency-Check report
+                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                }
+            }
+        }
         stage('Deliver') {
             steps {
                 sh 'chmod +x ./jenkins/scripts/deliver.sh'
