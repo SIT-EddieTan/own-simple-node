@@ -4,14 +4,12 @@ pipeline {
         stage('OWASP Dependency-Check Vulnerabilities') {
             steps {
                 script {
-                    // Run OWASP Dependency-Check
-                    dependencyCheck additionalArguments: '''
-                        -o './'
-                        -s './'
-                        -f 'ALL'
-                        --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
-
-                    // Publish Dependency-Check report
+                    dependencyCheck additionalArguments: ''' 
+                    -o './'
+                    -s './'
+                    -f 'ALL' 
+                    --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+        
                     dependencyCheckPublisher pattern: 'dependency-check-report.xml'
                 }
             }
