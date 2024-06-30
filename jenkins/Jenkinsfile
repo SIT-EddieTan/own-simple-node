@@ -1,23 +1,50 @@
-pipeline {
+pipeline 
+{
     agent any
-    stages {
-        stage('OWASP Dependency-Check Vulnerabilities') {
-            steps {
-                script {
-                    dependencyCheck additionalArguments: ''' 
+
+    tools 
+
+    stages
+    {
+        stage('Checkout') 
+        {
+            steps 
+            {
+                checkout scm
+            }
+        }
+
+        stage('Build') 
+        {
+            steps 
+            {
+                // Install project dependencies
+                sh 'npm install'
+
+                // Fix vulnerabilities in project dependencies
+                sh 'npm audit fix'
+
+                // Verify Dockerfile exists
+                sh 'ls -l'
+                
+                // Build the project
+                sh 'npm run build'
+            }
+        }
+
+        stage('OWASP Dependency-Check Vulnerabilities')     
+        {
+            steps 
+            {
+                dependencyCheck additionalArguments: ''' 
                     -o './'
                     -s './'
                     -f 'ALL' 
+                    //--nvdApiDelay 16000
                     --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
         
-                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                }
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
-        }
-    }
-    post {
-        always {
-            echo 'Cleaning up...'
         }
     }
 }
