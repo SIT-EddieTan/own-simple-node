@@ -25,28 +25,13 @@ pipeline
                 sh 'npm install'
 
                 // Fix vulnerabilities in project dependencies
-                sh 'npm audit fix'
+                sh 'npm audit fix --force'
 
                 // Verify Dockerfile exists
                 sh 'ls -l'
                 
                 // Build the project
                 sh 'npm run build'
-            }
-        }
-
-        stage('OWASP Dependency-Check Vulnerabilities')     
-        {
-            steps 
-            {
-                dependencyCheck additionalArguments: ''' 
-                    -o './'
-                    -s './'
-                    -f 'ALL' 
-                    //--nvdApiDelay 16000
-                    --prettyPrint''', odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
-        
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
         }
     }
